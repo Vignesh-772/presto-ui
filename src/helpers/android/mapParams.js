@@ -1575,6 +1575,33 @@ var map = {
     dontMap: 'true',
     fnName: 'setSelectAllOnFocus',
     inVokedIn: 'VIEW',
+  },
+  overScrollMode: {
+    values: [{
+      type: 'i',
+      never: 2,
+      always: 0 ,
+      if_content_scroll: 1
+    }],
+    fnName: 'setOverScrollMode',
+    inVokedIn: 'VIEW',
+  },
+  scrollDirection: {
+    values: [{
+      type: 'i',
+      horizontal: 0,
+      vertical: 1,
+    }],
+    fnName: 'setOrientation',
+    inVokedIn: 'VIEW',
+  },
+  "pageTransformer": {
+    values: [{
+      type: 's',
+    }],
+    'dontMap': true,
+    fnName: 'setPageTransformer',
+    inVokedIn: 'VIEW'
   }
 }
 

@@ -142,7 +142,9 @@ function getConfigGroups(config, type) {
         delete config["afterRender"];
       }else{
         config[keys[i]] = callbackMapper.map(config[keys[i]]);
-
+        if (keys[i] == "onPageScrollStateChanged") {
+          window.__THROTTELED_ACTIONS.push(config[keys[i]]);
+        }
         if (keys[i] == "onClick"){
           window.__FN_MAP[config[keys[i]]] = config.text || utils.getId(config) || "";
 
@@ -247,7 +249,7 @@ function getCtr(viewGroup) {
     'appBarLayout': 'android.support.design.widget.AppBarLayout$LayoutParams->new',
     'view': 'android.widget.LinearLayout$LayoutParams->new',
     'tabLayout': 'android.widget.LinearLayout$LayoutParams->new',
-    'viewPager': 'androidx.viewpager2.widget.ViewPager2$LayoutParams->new',
+    'viewPager2': 'androidx.viewpager2.widget.ViewPager2$LayoutParams->new',
     'listView': 'android.widget.LinearLayout$LayoutParams->new',
     'expandableListView': 'android.widget.LinearLayout$LayoutParams->new',
     'recyclerView': 'androidx.recyclerview.widget.RecyclerView$LayoutParams->new',
@@ -497,6 +499,12 @@ function mashThis(attrs, obj, belongsTo, transformFn, allProps, type, patchImage
     prePend += "get_mask->setShape:get_rect;";
     currTransVal = "get_colorlist";
   }
+  if (attrs.key == "pageTransformer") {
+    prePend = "set_transformer=in.juspay.mobility.app.carousel.VPPageTransformer->new:s_" + attrs.value + ";";
+    prePend += "this->setPageTransformer:get_transformer;";
+    dontLoad = true;
+  }
+
   if (attrs.key == "fontStyle") {
     if(isURL(attrs.value)) {
       if(typeof window.__PROXY_FN == "undefined") {
