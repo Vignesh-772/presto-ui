@@ -1425,6 +1425,50 @@ function this_setupList(listData, listItem) {
     };
 }
 
+function this_setupCarouselList(listData, listItem) {
+  return {
+    "return": "false",
+    "fromStore": "true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType ? "this" : "MJPCarouselView",
+    "methodName": "setupData::",
+    "values": [{ "name": encodeURI(listData), type: "s" }, { "name": listItem, type: "s" }]
+    };
+}
+
+function this_setCurrentPage(value) {
+  return {
+    "return": "false",
+    "fromStore": "true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType ? "this" : "MJPCarouselView",
+    "methodName": "setCurrentPage:",
+    "values": [{ "name": value, type: "i" }]
+    };
+}
+
+function this_setScrollDirection(value) {
+  return {
+    "return": "false",
+    "fromStore": "true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType ? "this" : "MJPCarouselView",
+    "methodName": "setScrollDirection:",
+    "values": [{ "name": value, type: "s" }]
+    };
+}
+
+function this_setPageCallbacks(type, callback) {
+  return {
+    "return": "false",
+    "fromStore": getSetType ? "false" : "true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType ? "this" : "UIView",
+    "methodName": type,
+    "values": [{ "name": callback, type: "s" }]
+  };
+}
+
 function this_inlineAnimation(config) {
   return {
     "return": "false",
@@ -1722,13 +1766,14 @@ function UIColor_setColor(color) {
   return UIColor_colorWithRGBA(r, g, b, a);
 }
 
-function transformKeys(config) {
+function transformKeys(type, config) {
   var keys =  Object.keys(config);
   for (var i = 0; i<keys.length; i++) {
     if (typeof config[keys[i]] == "undefined" || config[keys[i]] == null) {
       delete config[keys[i]];
     } else if (typeof config[keys[i]] == "function") {
       config[keys[i]] = callbackMapper.map(config[keys[i]]);
+      if (type == "mJPCarouselView") setPageCallbacks(config,keys[i],config[keys[i]]);
     } else {
       if (keys[i] !== "id" &&
           keys[i] !== "__filename" &&
@@ -1736,6 +1781,7 @@ function transformKeys(config) {
           keys[i] !== "methods"  &&
           keys[i] !== "swipeEnable" &&
           keys[i] !== "viewPager" &&
+          keys[i] !== "viewPager2" &&
           keys[i] !== "tableView") {
 
         delete config[keys[i]];
@@ -1744,6 +1790,13 @@ function transformKeys(config) {
   }
 
   return config;
+}
+
+function setPageCallbacks (config, action, callBack) {
+  if (action == "onPageSelected" || action == "onPageScrolled" || action == "onPageScrollStateChanged") {
+    let fnName = "set" + action[0].toUpperCase() + action.substring(1) + ":";
+    config.methods.push(this_setPageCallbacks(fnName,callBack));
+  }
 }
 
 function generateType(type, config) {
@@ -1797,6 +1850,9 @@ function generateType(type, config) {
     case "collectionView":
     case "viewPager":{
       modifiedType = "mJPCollectionView";
+    }
+    case "viewPager2":{
+      modifiedType = "mJPCarouselView";
     }
     break;
     case "progressBar": {
@@ -1893,6 +1949,10 @@ function changeKeys(config, type) {
     break;
     case "listview":
       if(config.hasOwnProperty("height") && config.height == "wrap_content"){
+        config.height = "match_parent"
+      }
+    case "viewPager2":
+      if(config.hasOwnProperty("width") && config.width == "wrap_content"){
         config.height = "match_parent"
       }
     break;
@@ -2287,7 +2347,6 @@ module.exports = function(type, config, _getSetType, namespace) {
 
   if (config.fontWeight) {
     var prop = config.fontWeight.split(",");
-    console.log("inside font Weight", config.fontWeight, prop)
     config.methods.push(UIFont_systemFontOfSizeWeight((config.textSize || "14") + "", mapToIosFontWeight(prop[0]) || "0.0"));
     config.methods.push(this_setFont());
   }
@@ -2578,7 +2637,19 @@ module.exports = function(type, config, _getSetType, namespace) {
     }
     config.listData = JSON.stringify(listDataObj)
     item.itemView = Android.createListData(config.id, item.itemView);
-    config.methods.push(this_setupList(config.listData, JSON.stringify(item)));
+    if (type == "mJPCarouselView") {
+      config.methods.push(this_setupCarouselList(config.listData, JSON.stringify(item)));
+    } else {
+      config.methods.push(this_setupList(config.listData, JSON.stringify(item)));
+    }
+  }
+
+  if (config.hasOwnProperty("currentItem")) {
+    config.methods.push(this_setCurrentPage(config.currentItem));
+  }
+
+  if (config.hasOwnProperty("scrollDirection")) {
+    config.methods.push(this_setScrollDirection(config.scrollDirection));
   }
 
   if (config.hasOwnProperty("inlineAnimation")) {
@@ -2693,7 +2764,7 @@ module.exports = function(type, config, _getSetType, namespace) {
   }
 
   config.currChildOffset = 0;
-  config = transformKeys(config);
+  config = transformKeys(type, config);
 
   return {config: config, type: type};
 };
