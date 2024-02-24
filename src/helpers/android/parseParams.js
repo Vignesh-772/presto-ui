@@ -969,9 +969,15 @@ function validString(str){
     try{
       const strArray = attrs.value.split(",");
       const imageName = strArray[0];
-      const url = strArray[1];
+      let url = strArray[1];
       const preferLocal = strArray[2]=="true";
-      const image = url.substr(url.lastIndexOf("/") + 1);
+      let image;
+      if (imageName.startsWith("url->")){
+        image = url;
+        url = imageName.slice(5);
+      } else {
+        image = url.substr(url.lastIndexOf("/") + 1);
+      }
       if(window.juspayAssetConfig && window.juspayAssetConfig.images){
         const images = window.juspayAssetConfig.images;
         const isUrl = isURL(url);
