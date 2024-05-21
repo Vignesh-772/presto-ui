@@ -994,6 +994,19 @@ function this_setTextColor() {
   }
 }
 
+function this_setProgressBarColor() {
+  return {
+    "return": "false",
+    "fromStore": getSetType?"false":"true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType?"this":"MJPActivityIndicator",
+    "methodName":"setProgressBarColor:",
+    "values":[
+      {"name": 'color' + window.__COLOR_INDEX, "computed": "true"}
+    ]
+  }
+}
+
 function this_setTextLengthLimit(length) {
   return {
     "return": "false",
@@ -2155,8 +2168,12 @@ module.exports = function(type, config, _getSetType, namespace) {
       const id = cS(config.id);
       const strArray = config.imageUrlWithFallback.split(",");
       const imageName = strArray[0];
-      const url = strArray[1];
+      let url = strArray[1];
       const preferLocal = strArray[2]=="true";
+      if (strArray[0].startsWith("url->")){
+        imageName = url;
+        url = strArray[0].slice(5);
+      }
       if(window.juspayAssetConfig && window.juspayAssetConfig.images){
         const images = window.juspayAssetConfig.images;
         if(validString(imageName) && (images[imageName] || images["jp_"+imageName])){
@@ -2753,6 +2770,10 @@ module.exports = function(type, config, _getSetType, namespace) {
   if (config.hasOwnProperty("rippleColor")) {
     config.methods.push(UIColor_setColor(config.rippleColor));
     config.methods.push(this_setRippleColor());
+  }
+  if (config.hasOwnProperty("progressBarColor")) {
+    config.methods.push(UIColor_setColor(config.progressBarColor));
+    config.methods.push(this_setProgressBarColor());
   }
 
   if (config.hasOwnProperty("disableFeedback")) {

@@ -114,7 +114,7 @@ function getConfigGroups(config, type) {
   if(type != "textView") {
     delete config.maxWidth
   }
-  if(type == "progressBar"){
+  if(type == "progressBar" && strokeVal){
     console.log("progressBar", strokeVal)
     config["progressBarColor"] = strokeVal
     delete config.stroke
