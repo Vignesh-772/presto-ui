@@ -158,6 +158,18 @@ function UIColor_colorWithRGBA(r,g,b,a) {
   }
 }
 
+function this_addQR(data) {
+  return {
+    "return": "false",
+    "invokeOn": "HyperQR",
+    "methodName":"generateQRCodeForData:addOnImageView:",
+    "values":[
+      {"name": data, "type": "s"},
+      {"name": "null", "computed": "true", "type": "this"}
+    ]
+  }
+}
+
 function this_pivotX(value) {
   return {
     "return": "false",
@@ -2242,6 +2254,10 @@ module.exports = function(type, config, _getSetType, namespace) {
 
   if (config.hasOwnProperty("adjustViewWithKeyboard")) {
       config.methods.push(this_adjustViewWithKeyboard(config.adjustViewWithKeyboard));
+  }
+
+  if (config.qr) {
+    config.methods.push(this_addQR(config.qr.split(",")[0]));
   }
 
   if (config.hasOwnProperty("playGif")){

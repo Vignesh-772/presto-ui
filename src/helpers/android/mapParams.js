@@ -1602,6 +1602,14 @@ var map = {
     'dontMap': true,
     fnName: 'setPageTransformer',
     inVokedIn: 'VIEW'
+  },
+  "qr": {
+    values: [{
+      type: 's',
+    }],
+    'dontMap': true,
+    fnName: '',
+    inVokedIn: 'VIEW'
   }
 }
 

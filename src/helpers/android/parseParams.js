@@ -1052,6 +1052,21 @@ function validString(str){
     }
   }
 
+  if (attrs.key == "qr") {
+    const values = attrs.value.split(",")
+    let qrSize = values[1];
+    dontLoad = true;
+    const qrMargin = values[2] || "0";
+    prePend = "";
+    if (!qrSize) {
+      prePend += "set_qrSize=this->getHeight;";
+      qrSize = "get_qrSize;"
+    } else {
+      qrSize = "i_" + qrSize;
+    }
+    prePend += "set_bitmap=in.juspay.hyperqr.QrHelper->getQrBitMap:s_" + handleSpecialChars(values[0]) + "," + qrSize + ",i_" + qrMargin + ";"
+    prePend += "this->setImageBitmap:get_bitmap;"
+  }
 
   if (attrs.key == "cursorColorV2") {
     const id = allProps.find(a => a.key === "id");
@@ -1452,6 +1467,7 @@ var flattenObject = function(ob) {
 };
 
 function configFunction(type, config, _getSetType, patchImageCB) {
+  console.log("type, config, _getSetType, patchImageCB ", type, config, _getSetType, patchImageCB)
   config = flattenObject(config);
   getSetType = _getSetType;
   elementType = type;
