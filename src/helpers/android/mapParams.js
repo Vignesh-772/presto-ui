@@ -52,7 +52,6 @@ var map = {
     values: [{
       type: 'b'
     }],
-    dontMap: true,
     inVokedIn: 'VIEW',
     fnName: "setRefreshing",
   },
@@ -60,7 +59,6 @@ var map = {
     values: [{
       type: 'b'
     }],
-    dontMap: true,
     inVokedIn: 'VIEW',
     fnName: "setEnabled",
   },
