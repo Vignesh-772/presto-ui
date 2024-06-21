@@ -1467,7 +1467,6 @@ var flattenObject = function(ob) {
 };
 
 function configFunction(type, config, _getSetType, patchImageCB) {
-  console.log("type, config, _getSetType, patchImageCB ", type, config, _getSetType, patchImageCB)
   config = flattenObject(config);
   getSetType = _getSetType;
   elementType = type;
