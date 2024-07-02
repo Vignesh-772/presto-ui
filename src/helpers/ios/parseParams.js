@@ -1488,7 +1488,19 @@ function this_setPageCallbacks(type, callback) {
     "return": "false",
     "fromStore": getSetType ? "false" : "true",
     "storeKey": "view" + window.__VIEW_INDEX,
-    "invokeOn": getSetType ? "this" : "UIView",
+    "invokeOn": getSetType ? "this" : "MJPCarouselView",
+    "methodName": type,
+    "values": [{ "name": callback, type: "s" }]
+  };
+}
+
+
+function this_setCallbacks(type, callback) {
+  return {
+    "return": "false",
+    "fromStore": getSetType ? "false" : "true",
+    "storeKey": "view" + window.__VIEW_INDEX,
+    "invokeOn": getSetType ? "this" : "MJPView",
     "methodName": type,
     "values": [{ "name": callback, type: "s" }]
   };
@@ -1798,6 +1810,7 @@ function transformKeys(type, config) {
       delete config[keys[i]];
     } else if (typeof config[keys[i]] == "function") {
       config[keys[i]] = callbackMapper.map(config[keys[i]]);
+      handleAnimationCallbacks(config,keys[i]);
       if (type == "mJPCarouselView") setPageCallbacks(config,keys[i],config[keys[i]]);
     } else {
       if (keys[i] !== "id" &&
@@ -1821,6 +1834,17 @@ function setPageCallbacks (config, action, callBack) {
   if (action == "onPageSelected" || action == "onPageScrolled" || action == "onPageScrollStateChanged") {
     let fnName = "set" + action[0].toUpperCase() + action.substring(1) + ":";
     config.methods.push(this_setPageCallbacks(fnName,callBack));
+  }
+}
+
+function handleAnimationCallbacks (config, action) {
+  if (action == "onAnimationEnd"){
+    let fnName = "setAnimationEndCallback:";
+    config.methods.push(this_setCallbacks(fnName,config[action]));
+  }
+  if (action == "onAnimationStart"){ 
+    let fnName = "setAnimationStartCallback:";
+    config.methods.push(this_setCallbacks(fnName,config[action]));
   }
 }
 
@@ -2081,7 +2105,7 @@ module.exports = function(type, config, _getSetType, namespace) {
     if (config.hasOwnProperty("gradient")) {
       var gradient = JSON.parse(config.gradient);
       var gradientType = gradient.type;
-      var gradientAngle = gradient.angle;
+      var gradientAngle = -gradient.angle + 90;
       var colours = [];
 
       gradient.values.forEach(color => {
@@ -2126,6 +2150,12 @@ module.exports = function(type, config, _getSetType, namespace) {
   if (config.hasOwnProperty("borderColor")) {
     config.methods.push(UIColor_setColor(config.borderColor));
     config.methods.push(setBorderColor());
+  }
+
+  if (config.enableAnimateOnGone) {
+    let id = cS(config.id);
+    window.animate_on_gone_views = window.animate_on_gone_views || {};
+    window.animate_on_gone_views[id] = config.enableAnimateOnGone;
   }
 
   if (config.debug) {

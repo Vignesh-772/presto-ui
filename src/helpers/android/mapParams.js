@@ -1608,6 +1608,14 @@ var map = {
     'dontMap': true,
     fnName: '',
     inVokedIn: 'VIEW'
+  },
+  "enableAnimateOnGone": {
+    values: [{
+      type: 's',
+    }],
+    'dontMap': true,
+    fnName: '',
+    inVokedIn: 'VIEW'
   }
 }
 

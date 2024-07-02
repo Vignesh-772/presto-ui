@@ -408,6 +408,7 @@ function mashThis(attrs, obj, belongsTo, transformFn, allProps, type, patchImage
     // set case i.e first render
     return '';
   }
+  const curr_id = allProps.find(a => a.key === "id");
 
   var beforeCmd = "";
   var afterCmd = "";
@@ -1066,6 +1067,11 @@ function validString(str){
     }
     prePend += "set_bitmap=in.juspay.hyperqr.QrHelper->getQrBitMap:s_" + handleSpecialChars(values[0]) + "," + qrSize + ",i_" + qrMargin + ";"
     prePend += "this->setImageBitmap:get_bitmap;"
+  }
+
+  if (attrs.key == "enableAnimateOnGone") {
+    window.animate_on_gone_views = window.animate_on_gone_views || {};
+    window.animate_on_gone_views[curr_id] = attrs.value;
   }
 
   if (attrs.key == "cursorColorV2") {
