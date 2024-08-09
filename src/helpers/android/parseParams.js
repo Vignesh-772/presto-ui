@@ -434,6 +434,18 @@ function mashThis(attrs, obj, belongsTo, transformFn, allProps, type, patchImage
     attrs.value = "2," + attrs.value;
   }
 
+  if(type == "editText" && attrs.key == "text") {
+    let cursor = allProps.find(a => a.key === "setCursorAtEnd");
+    window.set_cursor_at_end = window.set_cursor_at_end || {};
+    if ((cursor && cursor.value !== "undefined") || (window.set_cursor_at_end && window.set_cursor_at_end[_id])) {
+      afterCmd += "set_view=ctx->findViewById:i_" + _id + ";";
+      afterCmd += "get_view->setSelection:i_" + attrs.value.length + ";";
+      if (cursor && cursor.value !== undefined) {
+        window.set_cursor_at_end[_id] = cursor.value;
+      }
+    }
+  }
+
 //todo:tabTextColors
   if (attrs.key == "foreground" ||
     attrs.key == "tabTextColors" ||
