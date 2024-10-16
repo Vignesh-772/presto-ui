@@ -54,7 +54,7 @@ var renderWrapper = function(view, cb, namespace){
   top.fragments = top.fragments || {}
   top.fragmentObjects = top.fragmentObjects || {};
   if(namespace == null || namespace == undefined || typeof top.fragments[namespace] != "number") {
-    return renderFunction(view, cb)
+    return renderFunction(view, cb, namespace)
   }
   var rootId = top.fragments[namespace];
   window.__VIEWS[rootId] = top.fragmentObjects[namespace]
