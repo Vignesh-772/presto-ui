@@ -446,6 +446,27 @@ function mashThis(attrs, obj, belongsTo, transformFn, allProps, type, patchImage
     }
   }
 
+  function getStrokeProps(allProps) {
+    let dashWidth = undefined;
+    let gapWidth = undefined;
+    for(let prop of allProps) {
+      if(prop.key == "dashWidth") {
+        dashWidth = prop.value.toString();
+      }
+      if(prop.key == "gapWidth") {
+        gapWidth = prop.value.toString();
+      }
+    }
+    if(dashWidth && gapWidth && dashWidth != "0" && gapWidth != "0") {
+      return ",dpf_" + dashWidth + ",dpf_" + gapWidth;
+    }
+    if(dashWidth && dashWidth != "0") {
+      return ",dpf_" + dashWidth + ",dpf_" + dashWidth;
+    }
+    return "";
+  }
+  
+
 //todo:tabTextColors
   if (attrs.key == "foreground" ||
     attrs.key == "tabTextColors" ||
@@ -456,8 +477,9 @@ function mashThis(attrs, obj, belongsTo, transformFn, allProps, type, patchImage
     attrs.key == "btnColor") {
 
     if (attrs.key == "stroke") {
+      const strokeProps = getStrokeProps(allProps);
       color = attrs.value.split(',')[1];
-      currTransVal = appendArgs(attrs,obj).split(',')[0] + ',get_colorInt';
+      currTransVal = appendArgs(attrs,obj).split(',')[0] + ',get_colorInt' + strokeProps;
     } else if(attrs.key == "tabTextColors"){
       color = attrs.value.split(',')[0];
       color1 = attrs.value.split(',')[1];
@@ -1172,6 +1194,10 @@ function validString(str){
     prePend =  "set_interp=android.view.animation.DecelerateInterpolator->new;";
     currTransVal = "get_interp";
   }
+
+  if (attrs.key == "gapWidth") { return "";}
+
+  if (attrs.key == "dashWidth") { return "";}
 
   if(attrs.key=="shimmer") {
     try {

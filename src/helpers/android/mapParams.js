@@ -1616,7 +1616,17 @@ var map = {
     'dontMap': true,
     fnName: '',
     inVokedIn: 'VIEW'
-  }
+  },
+  dashWidth: {
+    values:[],
+    subDrawable: "GradientDrawable",
+    inVokedIn: 'DRAWABLE'
+  },
+  gapWidth: {
+    values:[],
+    subDrawable: "GradientDrawable",
+    inVokedIn: 'DRAWABLE'
+  },
 }
 
 module.exports = map;
