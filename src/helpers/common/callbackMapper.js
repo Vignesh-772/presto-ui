@@ -38,7 +38,14 @@ module.exports.map = (fn) => {
 		} else if (window.__payload && window.__payload.service){
 			proxyFnName = window.__payload.service + "_" + proxyFnName;
 		}
-		window.__PROXY_FN[proxyFnName] = fn;
+		if (window.__PROXY_FN_MAP_TYPE === undefined) {
+			window.__PROXY_FN_MAP_TYPE = window.__PROXY_FN instanceof Map;
+		}
+		if (window.__PROXY_FN_MAP_TYPE) {
+			window.__PROXY_FN.set(proxyFnName, fn);
+		} else {
+			window.__PROXY_FN[proxyFnName] = fn;
+		}
 		window.__FN_INDEX++;
 		// console.log("Presto-UI Callback Mapper proxyFnName is",proxyFnName); 
 		return proxyFnName;

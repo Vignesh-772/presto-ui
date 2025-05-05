@@ -229,7 +229,7 @@ window.__SCREEN_STACK = [];
 window.__LAST_FN_CALLED = null;
 window.__THROTTELED_ACTIONS = [];
 window.__isMOBILE = window.innerWidth < 550 // this line takes up 80ms out of 360ms
-window.__isFIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1 || typeof InstallTrigger !== 'undefined';
+window.__isFIREFOX = false;
 // Adding temp fix - Will be moved to mystique-web
 try {
     window.__VIEWS = window.parent.__VIEWS?window.parent.__VIEWS:{};
@@ -252,21 +252,37 @@ window.callUICallback = function () {
         return JBridge.setClickFeedback(args[1]);
     }
 
+    if (window.__PROXY_FN_MAP_TYPE === undefined) {
+        window.__PROXY_FN_MAP_TYPE = window.__PROXY_FN instanceof Map;
+    }
+
     if (window.__THROTTELED_ACTIONS && window.__THROTTELED_ACTIONS.indexOf(fName) == -1) {
-        window.__PROXY_FN[fName].apply(null, functionArgs);
+        if (window.__PROXY_FN_MAP_TYPE) {
+            window.__PROXY_FN.get(fName).apply(null, functionArgs);
+        } else {
+            window.__PROXY_FN[fName].apply(null, functionArgs);
+        }
     } else if (window.__LAST_FN_CALLED && (fName == window.__LAST_FN_CALLED.fName)) {
         currTime = getCurrTime();
         timeDiff = currTime - window.__LAST_FN_CALLED.timeStamp;
 
         if (timeDiff >= 300) {
-            window.__PROXY_FN[fName].apply(null, functionArgs);
+            if (window.__PROXY_FN_MAP_TYPE) {
+                window.__PROXY_FN.get(fName).apply(null, functionArgs);
+            } else {
+                window.__PROXY_FN[fName].apply(null, functionArgs);
+            }
             window.__LAST_FN_CALLED.timeStamp = currTime;
         } else {
             console.warn("function throtteled", fName);
             console.warn("time diff", timeDiff);
         }
     } else {
-        window.__PROXY_FN[fName].apply(null, functionArgs);
+        if (window.__PROXY_FN_MAP_TYPE) {
+            window.__PROXY_FN.get(fName).apply(null, functionArgs);
+        } else {
+            window.__PROXY_FN[fName].apply(null, functionArgs);
+        }
         window.__LAST_FN_CALLED = {
             timeStamp: (new Date()).getTime(),
             fName: fName

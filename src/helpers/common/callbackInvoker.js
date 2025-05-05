@@ -1,4 +1,4 @@
-/* 
+/*
 
 This function executes a function stored in a hashmap. 
 It takes atleast a callback string (key for hashmap) to excute the function. 
@@ -22,25 +22,40 @@ function invokeUICallback () {
     if (window.__ALL_ONCLICKS && window.__ALL_ONCLICKS.indexOf(fName) != -1 && args[2] == "feedback" && JBridge && JBridge.setClickFeedback) {
         return JBridge.setClickFeedback(args[1]);
     }
-  
+
+    if (window.__PROXY_FN_MAP_TYPE === undefined) {
+        window.__PROXY_FN_MAP_TYPE = window.__PROXY_FN instanceof Map;
+    }
     if (window.__THROTTELED_ACTIONS && window.__THROTTELED_ACTIONS.indexOf(fName) == -1) {
         let proxyFnKey = fName;
         if (proxyFnKey.charAt(0) == '"')
             proxyFnKey = fName.substring(1, fName.length - 1);
-        window.__PROXY_FN[proxyFnKey].apply(null, functionArgs);
+        if (window.__PROXY_FN_MAP_TYPE) {
+            window.__PROXY_FN.get(proxyFnKey).apply(null, functionArgs);
+        } else {
+            window.__PROXY_FN[proxyFnKey].apply(null, functionArgs);
+        }
     } else if (window.__LAST_FN_CALLED && (fName == window.__LAST_FN_CALLED.fName)) {
         currTime = getCurrTime();
         timeDiff = currTime - window.__LAST_FN_CALLED.timeStamp;
-  
+
         if (timeDiff >= 300) {
-            window.__PROXY_FN[fName].apply(null, functionArgs);
+            if (window.__PROXY_FN_MAP_TYPE) {
+                window.__PROXY_FN.get(fName).apply(null, functionArgs);
+            } else {
+                window.__PROXY_FN[fName].apply(null, functionArgs);
+            }
             window.__LAST_FN_CALLED.timeStamp = currTime;
         } else {
             console.warn("function throtteled", fName);
             console.warn("time diff", timeDiff);
         }
     } else {
-        window.__PROXY_FN[fName].apply(null, functionArgs);
+        if (window.__PROXY_FN_MAP_TYPE) {
+            window.__PROXY_FN.get(fName).apply(null, functionArgs);
+        } else {
+            window.__PROXY_FN[fName].apply(null, functionArgs);
+        }
         window.__LAST_FN_CALLED = {
             timeStamp: (new Date()).getTime(),
             fName: fName
