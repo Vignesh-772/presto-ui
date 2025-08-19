@@ -218,7 +218,7 @@ try {
 } catch (error) {
     window.__PROXY_FN = {};
 }
-window.__FN_INDEX = 0;
+window.__FN_INDEX = window.__FN_INDEX || 0;
 window.__ROOTSCREEN = null;
 window.__CACHED_SCREENS = {};
 window.__SCREEN_COUNT = 0;
